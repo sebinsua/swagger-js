@@ -103,11 +103,24 @@ export function buildRequest({
       const builder = parameterBuilders[parameter.in]
       let value
 
-      if(parameter.in === 'body' && parameter.schema && parameter.schema.properties) {
+      // ORIGINAL:
+      /*
+      if (parameter.in === 'body' && parameter.schema && parameter.schema.properties) {
         value = parameters
       }
 
       value = parameter && parameter.name && parameters[parameter.name]
+      */
+
+      // NEW:
+      if (parameter.in === 'body' && parameter.schema && parameter.schema.properties) {
+        value = Object.keys(parameter.schema.properties).reduce((props, property) =>
+          Object.assign({}, props, {[property]: parameters[property]})
+        , {})
+      }
+      else {
+        value = parameter && parameter.name && parameters[parameter.name]
+      }
 
       if (typeof parameter.default !== 'undefined' && typeof value === 'undefined') {
         value = parameter.default

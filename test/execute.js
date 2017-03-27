@@ -449,14 +449,15 @@ describe('execute', () => {
       })
     })
 
-    it('should build a request for all given fields', function () {
+    /*
+    it('should build a request for all given fields (ORIGINAL)', function () {
       // Given
       const spec = {
         host: 'swagger.io',
         basePath: '/api',
         schemes: ['whoop'],
         paths: {
-          '/one/{two}': {
+          '/one/{one}': {
             put: {
               operationId: 'getMe',
               produces: ['mime/silent-french-type'],
@@ -475,9 +476,9 @@ describe('execute', () => {
                 },
                 {
                   in: 'path',
-                  name: 'two',
+                  name: 'one',
                   type: 'number',
-                  example: '2'
+                  example: '1'
                 },
                 {
                   in: 'body',
@@ -485,7 +486,7 @@ describe('execute', () => {
                   schema: {
                     type: 'object',
                     properties: {
-                      one: {
+                      two: {
                         type: 'string'
                       }
                     },
@@ -503,23 +504,99 @@ describe('execute', () => {
         operationId: 'getMe',
         parameters: {
           head: 'justTheHead',
-          two: '2',
-          body: {json: 'rulez'},
+          one: '1',
+          body: {
+            two: '2'
+          },
           question: 'answer'
         }})
 
       // Then
       expect(req).toEqual({
-        url: 'whoop://swagger.io/api/one/2?question=answer',
+        url: 'whoop://swagger.io/api/one/1?question=answer',
         method: 'PUT',
         headers: {
           head: 'justTheHead',
         },
         body: {
-          json: 'rulez'
+          two: '2'
         }
       })
     })
+    */
+
+    it('should build a request for all given fields (NEW)', function () {
+      // Given
+      const spec = {
+        host: 'swagger.io',
+        basePath: '/api',
+        schemes: ['whoop'],
+        paths: {
+          '/one/{one}': {
+            put: {
+              operationId: 'getMe',
+              produces: ['mime/silent-french-type'],
+              parameters: [
+                {
+                  in: 'query',
+                  name: 'question',
+                  type: 'string',
+                  example: 'hello'
+                },
+                {
+                  in: 'header',
+                  name: 'head',
+                  type: 'string',
+                  example: 'hi'
+                },
+                {
+                  in: 'path',
+                  name: 'one',
+                  type: 'number',
+                  example: '1'
+                },
+                {
+                  in: 'body',
+                  name: 'body',
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      two: {
+                        type: 'string'
+                      }
+                    },
+                    example: '2'
+                  }
+                },
+              ],
+            }
+          }
+        }
+      }
+
+      // When
+      const req = buildRequest({spec,
+        operationId: 'getMe',
+        parameters: {
+          head: 'justTheHead',
+          one: '1',
+          two: '2',
+          question: 'answer'
+        }})
+
+      // Then
+      expect(req).toEqual({
+        url: 'whoop://swagger.io/api/one/1?question=answer',
+        method: 'PUT',
+        headers: {
+          head: 'justTheHead',
+        },
+        body: {
+          two: '2'
+        }
+      })
+    })
+
   })
 
   // Note: this is to handle requestContentType and responseContentType
@@ -984,7 +1061,8 @@ describe('execute', () => {
           }
         }
 
-        it('should serialize the body', function () {
+        /*
+        it('should serialize the body (ORIGINAl)', function () {
           const spec2 = {
             host: 'swagger.io',
             paths: {
@@ -998,7 +1076,7 @@ describe('execute', () => {
                       type: 'string',
                     },
                     {
-                      name: 'bodyParam',
+                      name: 'body',
                       in: 'body',
                       required: true,
                       schema: {
@@ -1019,10 +1097,63 @@ describe('execute', () => {
             spec: spec2,
             operationId: 'getBlob',
             parameters: {
-              bodyParam: {
+              body: {
                 name: 'johny',
-                id: '123'
+                id: '123',
               },
+              someQuery: 'foo',
+            }})
+
+
+          expect(req).toEqual({
+            url: 'http://swagger.io/v1/blob/image.png?someQuery=foo',
+            method: 'POST',
+            body: {
+              name: 'johny',
+              id: '123',
+            },
+            headers: { }
+          })
+        })
+        */
+
+        it('should serialize the body (NEW)', function () {
+          const spec2 = {
+            host: 'swagger.io',
+            paths: {
+              '/v1/blob/image.png': {
+                post: {
+                  operationId: 'getBlob',
+                  parameters: [
+                    {
+                      name: 'someQuery',
+                      in: 'query',
+                      type: 'string',
+                    },
+                    {
+                      name: 'body',
+                      in: 'body',
+                      required: true,
+                      schema: {
+                        type: 'object',
+                        properties: {
+                          id: {type: 'integer'},
+                          name: {type: 'string'}
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+
+          const req = buildRequest({
+            spec: spec2,
+            operationId: 'getBlob',
+            parameters: {
+              name: 'johny',
+              id: '123',
               someQuery: 'foo',
             }})
 
