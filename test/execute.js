@@ -449,6 +449,7 @@ describe('execute', () => {
       })
     })
 
+    /*
     it('should build a request for all given fields (ORIGINAL)', function () {
       // Given
       const spec = {
@@ -524,8 +525,8 @@ describe('execute', () => {
         }
       })
     })
+    */
 
-    /*
     it('should build a request for all given fields (NEW)', function () {
       // Given
       const spec = {
@@ -597,7 +598,6 @@ describe('execute', () => {
         }
       })
     })
-  */
 
   })
 
@@ -1063,6 +1063,7 @@ describe('execute', () => {
           }
         }
 
+        /*
         it('should serialize the body (ORIGINAl)', function () {
           const spec2 = {
             host: 'swagger.io',
@@ -1116,8 +1117,8 @@ describe('execute', () => {
             headers: { }
           })
         })
+        */
 
-        /*
         it('should serialize the body (NEW)', function () {
           const spec2 = {
             host: 'swagger.io',
@@ -1169,7 +1170,6 @@ describe('execute', () => {
             headers: { }
           })
         })
-        */
 
         it('should not add values of body parameters to the URL', function () {
           const req = buildRequest({spec, operationId: 'postMe', parameters: {petId: 123}})
